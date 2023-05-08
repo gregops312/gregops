@@ -1,0 +1,64 @@
+name: ci
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  setup:
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Get Version
+        id: version
+        run: echo "version=$(cat package.json | jq -r '.version')" >> $GITHUB_OUTPUT
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+  test:
+    needs: [setup]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: |
+          echo "Should run: npm run test"
+
+      - name: Fetch latest release version
+        id: fetch-latest-release
+        uses: reloc8/action-latest-release-version@1.0.0
+
+      - name: Test
+        run: echo ${{ steps.fetch-latest-release.outputs.latest-release }}
+
+      - name: Version incremented?
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          if [[ "${{ needs.setup.outputs.version }}" == "${{ steps.fetch-latest-release.outputs.latest-release }}" ]]; then
+              echo "You must update the project version"
+              exit 1
+          fi

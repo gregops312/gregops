@@ -1,6 +1,6 @@
 {
   "name": "gregops",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "My personal CLI",
   "author": "Gregory Kman @gkman",
   "bin": {
@@ -17,10 +17,13 @@
     "/oclif.manifest.json"
   ],
   "dependencies": {
-    "@oclif/core": "^1.24.0",
+    "@oclif/core": "^2.8.5",
     "@oclif/plugin-help": "^5",
     "@oclif/plugin-plugins": "^2.1.12",
-    "axios": "^1.2.3"
+    "compare-versions": "^6.0.0-rc.1",
+    "dotenv": "^16.0.3",
+    "octokit": "^2.0.14",
+    "semver-sort": "^1.0.0"
   },
   "devDependencies": {
     "@oclif/test": "^2.2.20",

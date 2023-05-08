@@ -5,10 +5,11 @@
     "module": "commonjs",
     "outDir": "dist",
     "rootDir": "src",
+    "skipLibCheck": true,
     "strict": true,
-    "target": "es2019"
+    "target": "es2019",
   },
   "include": [
-    "src/**/*"
-  ]
+    "src/**/*",
+  ],
 }
