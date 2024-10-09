@@ -20,9 +20,12 @@
     "@oclif/core": "^2.8.5",
     "@oclif/plugin-help": "^5",
     "@oclif/plugin-plugins": "^2.1.12",
+    "@types/selenium-webdriver": "^4.1.12",
+    "axios": "^1.2.3",
     "compare-versions": "^6.0.0-rc.1",
     "dotenv": "^16.0.3",
     "octokit": "^2.0.14",
+    "selenium-webdriver": "^4.8.1",
     "semver-sort": "^1.0.0"
   },
   "devDependencies": {

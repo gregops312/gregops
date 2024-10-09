@@ -1,3 +1,8 @@
+EC2
+http://169.254.169.254/latest/user-data
+
+
+
 oclif-hello-world
 =================
 

@@ -62,3 +62,57 @@ jobs:
               echo "You must update the project version"
               exit 1
           fi
+
+  release:
+    if: github.ref_name == 'main'
+    needs: [setup, build, test]
+    runs-on: ubuntu-latest
+    # env:
+    #   AWS_ACCESS_KEY_ID: ${{ secrets.??? }}
+    #   AWS_SECRET_ACCESS_KEY: ${{ secrets.??? }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: npm install
+
+      # - name: Tag Version
+      #   uses: anothrNick/github-tag-action@1.61.0
+      #   env:
+      #     CUSTOM_TAG: ${{ needs.setup.outputs.version }}
+      #     GITHUB_TOKEN: ${{ secrets.GH_TAGGING_TOKEN }}
+      #     RELEASE_BRANCHES: main
+
+      # - name: Pack tarballs
+      #   run: npx oclif pack tarballs
+
+      # - name: Upload tarballs
+      #   run: npx oclif upload tarballs
+
+  # deploy:
+  #   if: github.ref_name == 'main'
+  #   needs: [setup, build, test, release]
+  #   permissions:
+  #     id-token: write
+  #     contents: read
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     AWS_ACCESS_KEY_ID: ${{ secrets.??? }}
+  #     AWS_SECRET_ACCESS_KEY: ${{ secrets.??? }}
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+
+  #     - name: Configure AWS credentials from Test account
+  #       uses: aws-actions/configure-aws-credentials@v1-node16
+  #       with:
+  #         aws-access-key-id: ${{ secrets.??? }}
+  #         aws-region: us-east-1
+  #         aws-secret-access-key: ${{ secrets.??? }}
+
+  #     - name: Update install script
+  #       run: aws s3 cp install.sh s3://bucket_name
+
+  #     - name: Promote tarballs
+  #       run: npx oclif promote --version ${{ needs.setup.outputs.version }} --sha $(git rev-parse --short ${{ github.sha }}) --xz
