@@ -1,0 +1,44 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: check-executables-have-shebangs
+      - id: check-illegal-windows-names
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-shebang-scripts-are-executable
+      - id: check-symlinks
+      - id: check-toml
+      - id: check-yaml
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: file-contents-sorter
+      - id: mixed-line-ending
+      - id: no-commit-to-branch
+      - id: pretty-format-json
+      - id: trailing-whitespace
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.11.0.1
+    hooks:
+      - id: shellcheck
+  # - repo: https://github.com/google/yamlfmt
+  #   rev: v0.19.0
+  #   hooks:
+  #     - id: yamlfmt
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.18.1
+    hooks:
+      - id: markdownlint-cli2
+
+# - repo: https://github.com/codespell-project/codespell
+#   rev: v2.4.1
+#   hooks:
+#   - id: codespell
+
+# - repo: https://github.com/checkmake/checkmake
+#   rev: 0.2.2
+#   hooks:
+#   - id: checkmake
