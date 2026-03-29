@@ -228,6 +228,12 @@ func sortDirectorySizes(dirSizes []dirSize, sortMethod string) {
 		sort.Slice(dirSizes, func(i, j int) bool {
 			return dirSizes[i].size < dirSizes[j].size
 		})
+	default:
+		// Unsupported sort method: inform user and fall back to size-based sorting
+		fmt.Fprintf(os.Stderr, "Unsupported sort method %q, defaulting to size\n", sortMethod)
+		sort.Slice(dirSizes, func(i, j int) bool {
+			return dirSizes[i].size < dirSizes[j].size
+		})
 	}
 }
 
