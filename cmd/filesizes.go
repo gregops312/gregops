@@ -73,7 +73,9 @@ func runFilesizes(rootPath, sortMethod string, limit int, formatter *output.Form
 	}
 
 	if len(dirSizes) == 0 {
-		formatter.PrintString("No directories found")
+		if err := formatter.PrintString("No directories found"); err != nil {
+			return err
+		}
 		return nil
 	}
 
