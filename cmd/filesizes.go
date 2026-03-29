@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	output "gregops/pkg"
+	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -50,7 +51,7 @@ Examples:
 		}
 
 		// Execute the native implementation
-		if err := runFilesizes(path, sortMethod, limit, formatter); err != nil {
+		if err := runFilesizes(path, sortMethod, limit, formatter, cmd.ErrOrStderr()); err != nil {
 			if perr := formatter.PrintError(err); perr != nil {
 				cmd.PrintErrln(err)
 			}
@@ -68,7 +69,7 @@ func init() {
 	filesizesCmd.Flags().StringP("output", "o", "text", "Output format (text, json)")
 }
 
-func runFilesizes(rootPath, sortMethod string, limit int, formatter *output.Formatter) error {
+func runFilesizes(rootPath, sortMethod string, limit int, formatter *output.Formatter, errWriter io.Writer) error {
 	// Get directory sizes
 	dirSizes, err := calculateDirectorySizes(rootPath)
 	if err != nil {
@@ -83,7 +84,7 @@ func runFilesizes(rootPath, sortMethod string, limit int, formatter *output.Form
 	}
 
 	// Sort the results
-	sortDirectorySizes(dirSizes, sortMethod)
+	sortDirectorySizes(dirSizes, sortMethod, errWriter)
 
 	// Limit the results (take the largest ones for human/size sort)
 	if limit > 0 && limit < len(dirSizes) {
@@ -218,7 +219,7 @@ func getDiskUsage(fileSize int64) int64 {
 	return ((fileSize-1)/blockSize + 1) * blockSize
 }
 
-func sortDirectorySizes(dirSizes []dirSize, sortMethod string) {
+func sortDirectorySizes(dirSizes []dirSize, sortMethod string, errWriter io.Writer) {
 	switch sortMethod {
 	case "name":
 		sort.Slice(dirSizes, func(i, j int) bool {
@@ -230,7 +231,7 @@ func sortDirectorySizes(dirSizes []dirSize, sortMethod string) {
 		})
 	default:
 		// Unsupported sort method: inform user and fall back to size-based sorting
-		fmt.Fprintf(os.Stderr, "Unsupported sort method %q, defaulting to size\n", sortMethod)
+		fmt.Fprintf(errWriter, "Unsupported sort method %q, defaulting to size\n", sortMethod)
 		sort.Slice(dirSizes, func(i, j int) bool {
 			return dirSizes[i].size < dirSizes[j].size
 		})
