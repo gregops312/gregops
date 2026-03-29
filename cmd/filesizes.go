@@ -30,15 +30,15 @@ Examples:
   %s %s ./src --limit 5
   %s %s ./src --limit 20 --sort name`, CliName, filesizesCmdName, CliName, filesizesCmdName, CliName, filesizesCmdName),
 	Args: cobra.MaximumNArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		limit, _ := cmd.Flags().GetInt("limit")
 		sortMethod, _ := cmd.Flags().GetString("sort")
 		formatStr, _ := cmd.Flags().GetString("output")
 
 		format, err := output.ParseFormat(formatStr)
 		if err != nil {
-			cmd.Printf("Invalid format: %v\n", err)
-			return
+			cmd.PrintErrf("Invalid format: %v\n", err)
+			return err
 		}
 
 		formatter := output.NewWithWriter(format, cmd.OutOrStdout())
@@ -51,9 +51,12 @@ Examples:
 
 		// Execute the native implementation
 		if err := runFilesizes(path, sortMethod, limit, formatter); err != nil {
-			formatter.PrintError(err)
-			return
+			if perr := formatter.PrintError(err); perr != nil {
+				cmd.PrintErrln(err)
+			}
+			return err
 		}
+		return nil
 	},
 }
 
@@ -97,8 +100,10 @@ func runFilesizes(rootPath, sortMethod string, limit int, formatter *output.Form
 		// Format path to match du output (with ./ prefix for subdirs)
 		displayPath := ds.path
 		if ds.path != rootPath {
-			relPath, _ := filepath.Rel(rootPath, ds.path)
-			if relPath == "." {
+			relPath, err := filepath.Rel(rootPath, ds.path)
+			if err != nil {
+				displayPath = ds.path
+			} else if relPath == "." {
 				displayPath = rootPath
 			} else {
 				displayPath = "./" + relPath
