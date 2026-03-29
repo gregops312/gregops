@@ -33,7 +33,9 @@ var versionCmd = &cobra.Command{
 		}
 
 		if err := formatter.PrintKeyValue(data); err != nil {
-			formatter.PrintError(err)
+			if perr := formatter.PrintError(err); perr != nil {
+				cmd.PrintErrln(err)
+			}
 		}
 	},
 }
