@@ -1,6 +1,6 @@
 # Variables
 BINARY_NAME=gregops
-GO_VERSION=1.21
+GO_VERSION=1.26
 MAIN_PACKAGE=.
 BUILD_DIR=build
 INSTALL_DIR=/usr/local/bin
