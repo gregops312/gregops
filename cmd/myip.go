@@ -22,21 +22,23 @@ var myipCmd = &cobra.Command{
 Examples:
   %s %s
   %s %s --detailed`, CliName, myipCmdName, CliName, myipCmdName),
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		detailed, _ := cmd.Flags().GetBool("detailed")
 		formatStr, _ := cmd.Flags().GetString("output")
 
 		format, err := output.ParseFormat(formatStr)
 		if err != nil {
-			fmt.Printf("Invalid format: %v\n", err)
-			return
+			fmt.Fprintf(cmd.ErrOrStderr(), "Invalid format: %v\n", err)
+			return err
 		}
 
 		formatter := output.NewWithWriter(format, cmd.OutOrStdout())
 		if err := getMyIP(detailed, formatter); err != nil {
 			formatter.PrintError(err)
-			return
+			return err
 		}
+
+		return nil
 	},
 }
 
