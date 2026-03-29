@@ -16,13 +16,13 @@ var versionCmd = &cobra.Command{
 	Use:   versionCmdName,
 	Short: fmt.Sprintf("Print the version number of %s", CliName),
 	Long:  fmt.Sprintf("All software has versions. This is %s's version.", CliName),
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		formatStr, _ := cmd.Flags().GetString("output")
 
 		format, err := output.ParseFormat(formatStr)
 		if err != nil {
-			fmt.Printf("Invalid format: %v\n", err)
-			return
+			cmd.PrintErrf("Invalid format: %v\n", err)
+			return err
 		}
 
 		formatter := output.NewWithWriter(format, cmd.OutOrStdout())
@@ -36,7 +36,9 @@ var versionCmd = &cobra.Command{
 			if perr := formatter.PrintError(err); perr != nil {
 				cmd.PrintErrln(err)
 			}
+			return err
 		}
+		return nil
 	},
 }
 
