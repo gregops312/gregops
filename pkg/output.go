@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -77,13 +78,17 @@ func (f *Formatter) PrintKeyValue(pairs map[string]interface{}) error {
 
 	// Find the longest key for alignment
 	maxKeyLen := 0
+	keys := make([]string, 0, len(pairs))
 	for key := range pairs {
+		keys = append(keys, key)
 		if len(key) > maxKeyLen {
 			maxKeyLen = len(key)
 		}
 	}
+	sort.Strings(keys)
 
-	for key, value := range pairs {
+	for _, key := range keys {
+		value := pairs[key]
 		padding := strings.Repeat(" ", maxKeyLen-len(key))
 		_, err := fmt.Fprintf(f.writer, "%s:%s %v\n", key, padding, value)
 		if err != nil {
@@ -103,11 +108,18 @@ func (f *Formatter) PrintTable(data []map[string]interface{}) error {
 		return f.printJSON(data)
 	}
 
-	// Extract headers from first row
-	var headers []string
-	for key := range data[0] {
+	// Collect the union of keys across all rows, then sort for stable output
+	keySet := make(map[string]struct{})
+	for _, row := range data {
+		for key := range row {
+			keySet[key] = struct{}{}
+		}
+	}
+	headers := make([]string, 0, len(keySet))
+	for key := range keySet {
 		headers = append(headers, key)
 	}
+	sort.Strings(headers)
 
 	// Calculate column widths for alignment
 	colWidths := make(map[string]int)
