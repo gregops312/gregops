@@ -1,6 +1,6 @@
 package main
 
-import "gregops/cmd"
+import "kops/cmd"
 
 func main() {
 	cmd.Execute()

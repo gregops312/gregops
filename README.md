@@ -1,66 +1,56 @@
-# GREGOPS - Go CLI with Cobra
+# kops - Go CLI with Cobra
 
 A command-line interface built with Go and the Cobra framework.
 
-## Build
-
-```bash
-# Using Makefile (recommended)
-make build
-```
-
-## Install
-
-```bash
-# Using Makefile (installs to /usr/local/bin)
-make install
-```
-
-## Develop
-
-The project includes a Makefile with common development tasks:
+## Building
 
 ```bash
 # Build the project
 make build
 
-# Run tests
-make test
+# Build for multiple platforms
+make build-all
+
+# Install the locally built binary
+make install
+
+# Uninstall the binary
+make uninstall
 
 # Clean build artifacts
 make clean
 
-# Format and vet code
+# Download and tidy dependencies
+make deps
+
+# Format, lint, and vet code
 make fmt
+make lint
 make vet
 
-# Install to system
-make install
-
-# Build for multiple platforms
-make build-all
+# Generate .gitignore
+make gitignore
 
 # Show all available commands
 make help
 
-# Using Makefile
+# Print the module dependency graph
+make mod-graph
+
+# Run tests
 make test
 
 # With coverage report
 make test-cover
-```
 
-### Building
-
-```bash
-# Using Go
-go build -o gregops
-
-# Using Makefile (recommended)
-make build
+# Update dependencies
+make update-deps
 
 # Development build with race detection
 make dev-build
+
+# Using Go
+go build -o kops
 ```
 
 ### Installing dependencies
