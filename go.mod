@@ -1,4 +1,4 @@
-module gregops
+module kops
 
 go 1.26.1
 

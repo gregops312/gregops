@@ -2,9 +2,9 @@ package cmd
 
 import (
 	"fmt"
-	output "gregops/pkg"
 	"io"
 	"io/fs"
+	output "kops/pkg"
 	"os"
 	"path/filepath"
 	"sort"

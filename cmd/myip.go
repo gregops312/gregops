@@ -3,8 +3,8 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-	output "gregops/pkg"
 	"io"
+	output "kops/pkg"
 	"net/http"
 	"strings"
 	"time"

@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const CliName = "gregops"
+const CliName = "kops"
 
 var rootCmd = &cobra.Command{
 	Use:   CliName,

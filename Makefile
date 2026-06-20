@@ -1,9 +1,7 @@
 # Variables
-BINARY_NAME=gregops
-GO_VERSION=1.26
+BINARY_NAME=kops
 MAIN_PACKAGE=.
 BUILD_DIR=build
-INSTALL_DIR=/usr/local/bin
 
 # Go parameters
 GOCMD=go
@@ -17,7 +15,7 @@ GOMOD=$(GOCMD) mod
 LDFLAGS=-ldflags "-s -w"
 BUILD_FLAGS=-v
 
-.PHONY: all build clean test deps fmt vet install uninstall help
+.PHONY: all build build-all clean deps dev-build fmt gitignore help install lint mod-graph test test-cover uninstall update-deps vet
 
 # Default target
 all: clean deps fmt vet test build
@@ -26,6 +24,27 @@ all: clean deps fmt vet test build
 build:
 	@echo "Building $(BINARY_NAME)..."
 	$(GOBUILD) $(BUILD_FLAGS) $(LDFLAGS) -o $(BINARY_NAME) $(MAIN_PACKAGE)
+
+# Install the locally built binary
+install: build
+	@GOPATH="$$(go env GOPATH)"; \
+	if [ -z "$$GOPATH" ]; then \
+		echo "GOPATH is not set; cannot install $(BINARY_NAME)."; \
+		exit 1; \
+	fi; \
+	echo "Installing $(BINARY_NAME) to $$GOPATH/bin..."; \
+	mkdir -p "$$GOPATH/bin"; \
+	install -m 755 $(BINARY_NAME) "$$GOPATH/bin/$(BINARY_NAME)"
+
+# Remove the installed binary
+uninstall:
+	@GOPATH="$$(go env GOPATH)"; \
+	if [ -z "$$GOPATH" ]; then \
+		echo "GOPATH is not set; nothing to remove."; \
+		exit 0; \
+	fi; \
+	echo "Removing $$GOPATH/bin/$(BINARY_NAME)..."; \
+	rm -f "$$GOPATH/bin/$(BINARY_NAME)"
 
 # Build for multiple platforms
 build-all: clean
@@ -43,7 +62,18 @@ clean:
 	@rm -f $(BINARY_NAME)
 	@rm -rf $(BUILD_DIR)
 
-.PHONY: gitignore
+# Download dependencies
+deps:
+	@echo "Downloading dependencies..."
+	$(GOMOD) download
+	$(GOMOD) tidy
+
+# Format code
+fmt:
+	@echo "Formatting code..."
+	gofmt -s -w .
+
+# Generate .gitignore
 gitignore:
 	@echo "Generating .gitignore file..."; \
 	if [ -f .gitignore ]; then \
@@ -58,6 +88,43 @@ gitignore:
 	mv .gitignore.tmp .gitignore; \
 	rm -f .gitignore.header .gitignore.generated; \
 	echo ".gitignore file generated."
+
+# Show available targets
+help:
+	@echo "Available targets:"
+	@echo "  all          Clean, download deps, format, vet, test, and build"
+	@echo "  build        Build the binary"
+	@echo "  build-all    Build binaries for multiple platforms"
+	@echo "  clean        Remove build artifacts"
+	@echo "  deps         Download and tidy Go modules"
+	@echo "  dev-build    Build with race detection"
+	@echo "  fmt          Format code"
+	@echo "  gitignore    Generate .gitignore"
+	@echo "  help         Show this help"
+	@echo "  install      Install the binary to GOPATH/bin"
+	@echo "  lint         Run golangci-lint"
+	@echo "  mod-graph    Print the module dependency graph"
+	@echo "  test         Run tests"
+	@echo "  test-cover   Run tests with coverage"
+	@echo "  uninstall    Remove the installed binary"
+	@echo "  update-deps  Update Go dependencies"
+	@echo "  vet          Run go vet"
+
+# Development build (with race detection)
+dev-build:
+	@echo "Building $(BINARY_NAME) for development..."
+	$(GOBUILD) -race $(BUILD_FLAGS) -o $(BINARY_NAME) $(MAIN_PACKAGE)
+
+# Lint the code (requires golangci-lint)
+lint:
+	@echo "Linting code..."
+	@command -v golangci-lint >/dev/null 2>&1 || { echo >&2 "golangci-lint is required but not installed. Install it with: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest"; exit 1; }
+	golangci-lint run
+
+# Generate Go modules graph
+mod-graph:
+	@echo "Generating module dependency graph..."
+	$(GOMOD) graph
 
 # Run tests (use TEST=pattern to run specific tests with -run flag)
 test:
@@ -78,40 +145,13 @@ else
 endif
 	$(GOCMD) tool cover -html=coverage.out -o coverage.html
 
-# Download dependencies
-deps:
-	@echo "Downloading dependencies..."
-	$(GOMOD) download
-	$(GOMOD) tidy
-
-# Format code
-fmt:
-	@echo "Formatting code..."
-	gofmt -s -w .
-
-# Vet code
-vet:
-	@echo "Vetting code..."
-	$(GOCMD) vet ./...
-
-# Development build (with race detection)
-dev-build:
-	@echo "Building $(BINARY_NAME) for development..."
-	$(GOBUILD) -race $(BUILD_FLAGS) -o $(BINARY_NAME) $(MAIN_PACKAGE)
-
-# Lint the code (requires golangci-lint)
-lint:
-	@echo "Linting code..."
-	@command -v golangci-lint >/dev/null 2>&1 || { echo >&2 "golangci-lint is required but not installed. Install it with: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest"; exit 1; }
-	golangci-lint run
-
-# Generate Go modules graph
-mod-graph:
-	@echo "Generating module dependency graph..."
-	$(GOMOD) graph
-
 # Update dependencies
 update-deps:
 	@echo "Updating dependencies..."
 	$(GOGET) -u ./...
 	$(GOMOD) tidy
+
+# Vet code
+vet:
+	@echo "Vetting code..."
+	$(GOCMD) vet ./...

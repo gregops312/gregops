@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	output "gregops/pkg"
+	output "kops/pkg"
 
 	"github.com/spf13/cobra"
 )
